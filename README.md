@@ -1,3 +1,6 @@
+**Video Walkthrough**
+https://www.youtube.com/watch?v=FhPwSQ_p-9I&ab_channel=OlsenBudanur
+
 **Initial Proposal for the project**
 
 **Glossary**
