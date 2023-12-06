@@ -1,16 +1,8 @@
-**Databases Project Proposal**
-
-An LLM Chatbot That Has Context Over a Large Corpus of Custom Data Using a Vector Database
-
-Olsen Budanur
-
-Niya Ma
-
 **Glossary**
 
 **Semantic Search:** “Semantic search seeks to improve search accuracy by understanding the searcher's intent and the contextual meaning of terms as they appear in the searchable dataspace, whether on the Web or within a closed system, to generate more relevant results.”
 
-**Embeddings: **“In natural language processing, a word embedding is a [vector] representation of a word.” An embedding of a word gives it a location in a higher dimensional plane, that is relevant to its semantic meaning. So, words or phrases that have similar semantic meanings will be close to each other in their embedding dimension which can allow us to do semantic search.
+**Embeddings:** “In natural language processing, a word embedding is a [vector] representation of a word.” An embedding of a word gives it a location in a higher dimensional plane, that is relevant to its semantic meaning. So, words or phrases that have similar semantic meanings will be close to each other in their embedding dimension which can allow us to do semantic search.
 
 **Vector Database:** “A vector database is a type of database that is specifically designed to store and query high-dimensional vectors.”
 
@@ -30,66 +22,31 @@ This project would be composed of 2 main parts/phases. The first part would be f
 
 **Part 1:**
 
+During this part, we will be populating our vector DB. Let’s think of the vector DB as a relational SQL database. First, we will create a table to store our embeddings/text:
 
+```SQL
+CREATE TABLE IF NOT EXISTS vector_db(
+   paragraph: TEXT
+   vector: BLOB
+);
+```
 
-<p id="gdcalert1" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image1.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert2">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
-
-
-![alt_text](images/image1.png "image_tooltip")
-
-
-**Figure 1: **Embed & Store
-
-	During this part, we will be populating our vector DB. Let’s think of the vector DB as a relational SQL database. First, we will create a table to store our embeddings/text:
-
-
-<table>
-  <tr>
-   <td><code>CREATE TABLE IF NOT EXISTS vector_db(</code>
-<p>
-<code>   paragraph: TEXT</code>
-<p>
-<code>   vector: BLOB</code>
-   </td>
-  </tr>
-  <tr>
-   <td><code>);</code>
-   </td>
-  </tr>
-</table>
-
-
-**Figure 2: **Pseudo Code for Creating Vector DB
 
 Now that our vector DB is ready, we will read a large corpus of data, partition it into pieces (or paragraphs), embed these paragraphs 1 by 1, and then feed it to the DB.
-
-
-```
+```python
 with open("large_corpus_data.txt", "r") as file:
 	for line in file:
 		embedding = API.embed(line)
 		SQL(`INSERT INTO vector_db (text, vector) VALUES (line, embedding)`)
 ```
 
-
-**Figure 3: **Pseudo Code for Populating the Vector DB
-
 **Part 2:**
 
-
-
-<p id="gdcalert2" ><span style="color: red; font-weight: bold">>>>>>  gd2md-html alert: inline image link here (to images/image2.png). Store image on your image server and adjust path/filename/extension if necessary. </span><br>(<a href="#">Back to top</a>)(<a href="#gdcalert3">Next alert</a>)<br><span style="color: red; font-weight: bold">>>>>> </span></p>
-
-
-![alt_text](images/image2.png "image_tooltip")
-
-
-**Figure 4: **Chatbot App
 
 During this part, we allow the user to submit a question through our app, vectorize the users’ question, search for parts of the text that are similar to the users question, feed the relevant parts of the text + the users question to the LLM, and display to the user the response of the LLM.
 
 
-```
+```python
 #
 # Embed users question (this will be done in a ui, and we
 # will keep the past N number of users questions as chat context)
@@ -124,15 +81,12 @@ print(answer)
 ```
 
 
-**Figure 5: **Pseudo Code for The Application Logic
 
 
 
 **Possible Technologies **
 
 **UI:**
-
-
 
 * HTML + CSS + JS STACK
 
