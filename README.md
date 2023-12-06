@@ -1,3 +1,5 @@
+**Initial Proposal for the project**
+
 **Glossary**
 
 **Semantic Search:** “Semantic search seeks to improve search accuracy by understanding the searcher's intent and the contextual meaning of terms as they appear in the searchable dataspace, whether on the Web or within a closed system, to generate more relevant results.”
