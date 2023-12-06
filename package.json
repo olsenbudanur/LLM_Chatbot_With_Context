@@ -1,0 +1,17 @@
+{
+  "name": "dbconnect",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql": "^2.18.1",
+    "pdf-parse": "^1.1.1",
+    "pdfjs-dist": "^4.0.269"
+  }
+}
