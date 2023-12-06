@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Chat with GPT-3.5</title>
+    <style>
+        .message-avatar {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            font-size: 20px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 50%;
+            margin-right: 10px;
+            margin-bottom: 6px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .user-message .message-avatar::before {
+            content: '👤'; 
+            background-color: #4CAF50; 
+        }
+
+        .bot-message .message-avatar::before {
+            content: '🤖'; 
+            background-color: #3498db; 
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .message-text {
+            border-radius: 12px;
+            padding: 12px 16px;
+            max-width: 70%;
+            word-wrap: break-word;
+            font-size: 26px;
+        }
+
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        #chat-box {
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: scroll;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+        }
+
+        .user-message {
+            background-color: #4CAF50;
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            align-self: flex-end;
+            margin-left: 30%;
+            margin-bottom: 6px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .bot-message {
+            background-color: #3498db;
+            color: #fff;
+            border-radius: 12px;
+            padding: 12px 16px;
+            align-self: flex-start;
+            margin-right: 30%;
+            margin-bottom: 6px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 100px);
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin: 20px;
+            font-size: 18px;
+        }
+
+        button {
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+            margin: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .loader {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #welcome-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            padding: 20px;
+            background-color: #007bff; 
+            color: #fff;
+            border-radius: 12px;
+            font-size: 24px; 
+        }
+
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        .action-buttons button {
+            padding: 12px 20px;
+            margin-right: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .action-buttons button:hover {
+            background-color: #0056b3;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .popup {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .popup input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .popup button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="chat-box">
+        <div id="welcome-message">
+            <p>Welcome, this is a Chatbot that has context of the data you uploaded! Ask away...</p>
+        </div>
+        <div id="chat-messages"></div>
+        <div class="loader" id="loader"></div>
+        <div style="display: flex;">
+            <input type="text" id="user-input" placeholder="Type a message to chat...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+        <div class="action-buttons">
+            <button onclick="clearDatabase()">Clear DB</button>
+            <button onclick="uploadDataToDB()">Upload Data to DB</button>
+            <button onclick="openQueryPopup()">Query</button>
+        </div>
+    </div>
+
+    <div class="overlay" id="queryPopup">
+        <div class="popup">
+            <input type="text" id="queryInput" placeholder="Enter your query...">
+            <button onclick="sendQuery()">Submit</button>
+        </div>
+    </div>
+
+    <script>
+        const userInput = document.getElementById("user-input");
+        userInput.addEventListener("keypress", function(event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                sendMessage();
+            }
+        });
+
+        const chatHistory = [];
+
+        async function sendMessage() {
+            const welcomeMessage = document.getElementById('welcome-message');
+            welcomeMessage.style.display = 'none';
+
+            const userMessage = document.getElementById('user-input').value.trim();
+            if (userMessage === '') return;
+
+            const chatMessages = document.getElementById('chat-messages');
+            const userMessageContainer = document.createElement('div');
+            userMessageContainer.classList.add('message-container', 'user-message');
+            const userAvatar = document.createElement('div');
+            userAvatar.classList.add('message-avatar');
+            userMessageContainer.appendChild(userAvatar);
+            const userMessageElement = document.createElement('div');
+            userMessageElement.classList.add('message-text');
+            userMessageElement.innerText = userMessage;
+            userMessageContainer.appendChild(userMessageElement);
+            chatMessages.appendChild(userMessageContainer);
+
+            chatHistory.push({ role: 'user', content: userMessage });
+
+            if (chatHistory.length > 5) {
+                chatHistory.shift();
+            }
+
+            document.getElementById('user-input').value = '';
+            document.getElementById('loader').style.display = 'block';
+
+            const response = await chatWithGPT(chatHistory.slice(-5));
+
+            document.getElementById('loader').style.display = 'none';
+
+            const botMessageContainer = document.createElement('div');
+            botMessageContainer.classList.add('message-container', 'bot-message');
+            const botAvatar = document.createElement('div');
+            botAvatar.classList.add('message-avatar');
+            botMessageContainer.appendChild(botAvatar);
+            const botMessageElement = document.createElement('div');
+            botMessageElement.classList.add('message-text');
+            botMessageElement.innerText = response;
+            botMessageContainer.appendChild(botMessageElement);
+            chatMessages.appendChild(botMessageContainer);
+            
+            chatHistory.push({ role: 'assistant', content: response });
+
+            if (chatHistory.length > 5) {
+                chatHistory.shift();
+            }
+        }
+
+        async function chatWithGPT(messages) {
+            const data = {
+                messages: messages
+            };
+
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const responseData = await response.json();
+                return responseData;
+            } catch (error) {
+                console.error('Error:', error);
+                return 'Sorry, something went wrong.';
+            }
+        }
+
+
+        async function clearDatabase() {
+            try {
+                const response = await fetch('./resetDatabase', {
+                    method: 'GET'
+                });
+
+                alert('Database cleared');
+            } catch (error) {
+                console.error('Error clearing database:', error);
+            }
+        }
+
+        async function uploadDataToDB() {
+            try {
+                const response = await fetch('./uploadDataDir', {
+                    method: 'GET'
+                });
+
+                alert('Data uploaded to DB');
+            } catch (error) {
+                console.error('Error uploading data to DB:', error);
+            }
+        }
+
+
+        function openQueryPopup() {
+            document.getElementById('queryPopup').style.display = 'flex';
+        }
+
+        async function sendQuery() {
+            const queryInput = document.getElementById('queryInput').value.trim();
+            if (queryInput === '') return;
+
+            try {
+                const response = await fetch('/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ query: queryInput })
+                });
+                const responseData = await response.json();
+                
+                //
+                // Open a new page to display the response
+                const newWindow = window.open();
+                newWindow.document.write('<html><head><title>Query Response</title></head><body>');
+
+                //
+                // Display each text and its score
+                responseData.forEach(item => {
+                    newWindow.document.write(`
+                        <div style="margin-bottom: 20px;">
+                            <p><strong>Text:</strong> ${item.text}</p>
+                            <p><strong>Score:</strong> ${item.score}</p>
+                        </div>
+                        <hr>
+                    `);
+                });
+
+                newWindow.document.write('</body></html>');
+            } catch (error) {
+                console.error('Error sending query:', error);
+            }
+
+            // Close the query popup after sending the query
+            document.getElementById('queryPopup').style.display = 'none';
+        }
+
+    </script>
+</body>
+
+</html>
